@@ -47,6 +47,8 @@ class Blockchain {
       const computedHash = cryptoHash(
         block.data,
         block.lastHash,
+        block.difficulty,
+        block.nonce,
         block.timestamp
       );
       if (computedHash !== block.hash) return false;
