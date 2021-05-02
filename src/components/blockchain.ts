@@ -42,6 +42,7 @@ class Blockchain {
     for (let i = 1; i < chain.length; i++) {
       const block = chain[i];
       const lastBlock = chain[i - 1];
+      if (Math.abs(lastBlock.difficulty - block.difficulty) > 1) return false;
       if (block.lastHash !== lastBlock.hash) return false;
 
       const computedHash = cryptoHash(

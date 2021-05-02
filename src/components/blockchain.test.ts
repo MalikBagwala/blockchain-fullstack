@@ -1,3 +1,4 @@
+import cryptoHash from "../utils/hash.utils";
 import Block from "./block";
 import Blockchain from "./blockchain";
 
@@ -34,6 +35,27 @@ describe("Blockchain", () => {
     });
     it("Returns invalid when data is tampered with", () => {
       blockchain.chain[1].timestamp = 1212121;
+      expect(Blockchain.checkChainValidity(blockchain.chain)).toEqual(false);
+    });
+    it("Returns invalid when difficulty jumps by more than 1", () => {
+      const lastBlock = blockchain.last;
+      const lastHash = lastBlock.hash;
+      const timestamp = Date.now();
+
+      const nonce = 0;
+      const data = [];
+      const difficulty = lastBlock.difficulty - 3;
+      const hash = cryptoHash(lastHash, timestamp, nonce, data, difficulty);
+
+      const badBlock = new Block({
+        lastHash,
+        timestamp,
+        nonce,
+        data,
+        difficulty,
+        hash,
+      });
+      blockchain.chain.push(badBlock);
       expect(Blockchain.checkChainValidity(blockchain.chain)).toEqual(false);
     });
   });
