@@ -1,24 +1,46 @@
-import Block from "./components/block";
+import axios from "axios";
+import express from "express";
 import Blockchain from "./components/blockchain";
+import PubSub from "./pubSub";
 
+const ROOT_NODE_PORT = 3000;
+const ROOT_NODE_HOST = `http://localhost:${ROOT_NODE_PORT}`;
+const app = express();
 const blockchain = new Blockchain();
-blockchain.add({ data: "initial" });
+const pubSubBlockchain = new PubSub({ blockchain });
+app.use(express.json());
+app.get("/api/blockchain", (_, res) => {
+  return res.json(blockchain.chain);
+});
 
-let prevTimestamp, nextTimestamp, nextBlock: Block, timeDiff, average;
+app.post("/api/mineblock", (req, res) => {
+  if (req.body.data) {
+    blockchain.add({ data: req.body.data });
+    pubSubBlockchain.broadcastBlockchain();
+    return res.redirect("/api/blockchain");
+  }
+  // res.send(200);
+});
 
-const times: number[] = [];
-
-for (let i = 0; i < 10000; i++) {
-  prevTimestamp = blockchain.last.timestamp;
-  blockchain.add({ data: `block ${i}` });
-  nextBlock = blockchain.last;
-  nextTimestamp = blockchain.last.timestamp;
-  timeDiff = nextTimestamp - prevTimestamp;
-  times.push(timeDiff);
-
-  average = times.reduce((prev, time) => prev + time, 0) / times.length;
-
-  console.log(
-    `Time to mine: ${timeDiff}ms | Difficulty: ${nextBlock.difficulty} | Average Time: ${average}ms.`
-  );
+let PORT = ROOT_NODE_PORT;
+if (parseInt(process.env.PEER || "0")) {
+  PORT += Math.ceil(Math.random() * 1000);
 }
+console.log(PORT);
+
+async function syncChain() {
+  try {
+    const res = await axios.get(`${ROOT_NODE_HOST}/api/blockchain`);
+    if (res.status === 200) {
+      blockchain.replace(res.data);
+    }
+  } catch (err) {
+    console.log(`Cannot sync chains`, err);
+  }
+}
+app.listen(PORT, () => {
+  if (PORT !== ROOT_NODE_PORT) {
+    syncChain();
+  }
+  `Server started on port ${PORT}`;
+});
