@@ -4,6 +4,7 @@ export const NONCE_VALUE = 0;
  * Mine rate in miliseconds
  */
 export const MINE_RATE = 1000;
+export const WALLET_BALANCE = 1000;
 const GENESIS_DATA = {
   timestamp: 1619847281574,
   lastHash: "gHFAqOs1KebHbPGpGh6oWZ25p4YGutIQ",

@@ -9,3 +9,7 @@
 4. Binary output (256 characters) of the **SHA256** offers more flexibility than hex ( 64 characters) in terms of adjusting the difficulty since it comprises of only 1s and 0s. (ps. this is also what bitcoin uses :D )
 
 5. Proof of work (PoW) is a decentralized consensus mechanism that requires members of a network to expend effort solving an arbitrary mathematical puzzle to prevent anybody from gaming the system.
+
+6. Implemented a PubSub model built on Redis for every node to communicate with each other in the blockchain
+
+7. Wallets are entities in a blockchain which record the balance for a particular user, they have a publicKey and a privateKey for cryptographically signing the transaction. The public key allows other peers to validate a transaction
